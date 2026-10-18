@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clockt | Dashboard</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6fb;
+            margin: 0;
+            padding: 40px;
+            color: #1e293b;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+        }
+
+        h1 {
+            color: #2563eb;
+        }
+
+        .card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            margin-top: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Clockt</h1>
+        <p>Discover repetitive tasks and opportunities to save time.</p>
+
+        <div class="card">
+            <h2>Activity Analysis</h2>
+            <p>Analyze sample activity data to identify repetitive tasks.</p>
+            <div style="margin-bottom: 20px;">
+            <label for="activityInput">
+                <strong>Activity Data (JSON)</strong>
+            </label>
+        
+            <p>Enter activities manually, or use the sample data.</p>
+        
+            <textarea
+                id="activityInput"
+                rows="8"
+                style="width: 100%; box-sizing: border-box; padding: 12px;
+                       border: 1px solid #cbd5e1; border-radius: 8px;
+                       font-family: monospace;"
+                placeholder="Enter activity records here..."
+            ></textarea>
+        </div>
+            <button id="analyzeButton">Analyze Activities</button>
+        </div>
+
+        <div class="card">
+            <h2>Activity Summary</h2>
+            <div id="summary">
+                <p>Run an analysis to see your activity statistics.</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Analysis Results</h2>
+            <div id="results">
+                <p>No activities analyzed yet.</p>
+            </div>
+        </div>
+    </div>
+    <script>
+    const sampleActivities = [
+        { timestamp: "2026-10-17T10:00:00", application: "Excel", action: "Copy data", duration_seconds: 30 },
+        { timestamp: "2026-10-17T10:05:00", application: "Excel", action: "Copy data", duration_seconds: 25 },
+        { timestamp: "2026-10-17T10:10:00", application: "Excel", action: "Copy data", duration_seconds: 35 },
+        { timestamp: "2026-10-17T10:15:00", application: "Outlook", action: "Send email", duration_seconds: 60 },
+        { timestamp: "2026-10-17T10:20:00", application: "Outlook", action: "Send email", duration_seconds: 50 }
+    ];
+
+    document.getElementById("analyzeButton").addEventListener("click", async () => {
+        const results = document.getElementById("results");
+        results.textContent = "Analyzing activities...";
+
+        try {
+            const response = await fetch("/proxy/8000/v1/analyze-activities", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(
+                document.getElementById("activityInput").value.trim()
+                    ? JSON.parse(document.getElementById("activityInput").value)
+                    : sampleActivities
+            )
+            });
+
+            if (!response.ok) {
+                throw new Error(`API returned status ${response.status}`);
+            }
+
+            const data = await response.json();
+            const summary = document.getElementById("summary");
+
+            const totalActivities = data.activities_analyzed;
+            const repeatedTasks = data.repeated_activities.length;
+            
+            const totalSeconds = data.repeated_activities.reduce(
+                (sum, activity) => sum + activity.total_seconds,
+                0
+            );
+            
+            summary.replaceChildren();
+            
+            const statistics = [
+                `Activities analyzed: ${totalActivities}`,
+                `Repeated task types: ${repeatedTasks}`,
+                `Time spent on repeated tasks: ${totalSeconds} seconds`
+            ];
+            
+            for (const statistic of statistics) {
+                const paragraph = document.createElement("p");
+                paragraph.textContent = statistic;
+                summary.appendChild(paragraph);
+            }
+            results.replaceChildren();
+
+            for (const item of data.suggestions) {
+                const paragraph = document.createElement("p");
+                paragraph.textContent = item.suggestion;
+                results.appendChild(paragraph);
+            }
+
+            if (data.suggestions.length === 0) {
+                results.textContent = "No repeated activities detected.";
+            }
+        } catch (error) {
+            results.textContent = `Analysis failed: ${error.message}`;
+        }
+    });
+</script>
+</body>
+</html>
