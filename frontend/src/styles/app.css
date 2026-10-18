@@ -85,28 +85,16 @@ a {
   place-items: center;
   border: 1px solid rgba(255, 255, 255, 0.32);
   border-radius: 9px;
-  background: linear-gradient(145deg, #b28bff, #7850d7);
+  background: transparent;
+  border: none;
   box-shadow: 0 5px 14px rgba(144, 105, 237, 0.26);
 }
 
-.brand-mark::before,
-.brand-mark::after,
-.brand-mark span {
-  position: absolute;
-  width: 12px;
-  height: 2px;
-  border-radius: 3px;
-  background: #fff;
-  content: '';
-}
+/* brand-mark icon replaced with img */
 
-.brand-mark::before {
-  transform: translateY(-4px) rotate(29deg);
-}
 
-.brand-mark::after {
-  transform: translateY(4px) rotate(-29deg);
-}
+
+
 
 .brand-period {
   color: #ae91ff;

@@ -24,7 +24,7 @@ function Account() {
   return (
     <div className="account-page">
       <section className="account-card">
-        <Link to="/" className="account-brand"><span className="brand-mark"><span /></span> clockt<span>.</span></Link>
+        <Link to="/" className="account-brand"><img src="/src/assets/logo.png" alt="Clockt logo" className="brand-mark" style={{ objectFit: "contain" }} /> clockt<span>.</span></Link>
         <span className="dashboard-kicker">Your time, thoughtfully managed</span>
         <h1>{mode === 'signup' ? 'Make room for what matters.' : 'Welcome back.'}</h1>
         <p className="account-lede">Create a Clockt preview profile to personalize the ideas you see.</p>

@@ -66,7 +66,7 @@ function Sidebar() {
   return (
     <aside className="sidebar">
       <NavLink to="/" className="brand" aria-label="Clockt home">
-        <span className="brand-mark"><span /></span>
+        <img src="/src/assets/logo.png" alt="Clockt logo" className="brand-mark" style={{ objectFit: "contain" }} />
         <span>clockt<span className="brand-period">.</span></span>
       </NavLink>
 
