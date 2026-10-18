@@ -18,7 +18,7 @@ function Account() {
     }
     updateProfile({ fullName: mode === 'signup' ? fullName.trim() : workspace.profile.fullName, email: email.trim() })
     setPassword('')
-    setNotice('Preview profile updated. Secure sign-in is not connected to a backend yet, so your password was not saved.')
+    setNotice('Preview profile updated. Authentication is not enabled yet, so your password was not saved.')
   }
 
   return (
@@ -27,10 +27,10 @@ function Account() {
         <Link to="/" className="account-brand"><span className="brand-mark"><span /></span> clockt<span>.</span></Link>
         <span className="dashboard-kicker">Your time, thoughtfully managed</span>
         <h1>{mode === 'signup' ? 'Make room for what matters.' : 'Welcome back.'}</h1>
-        <p className="account-lede">Create a Clockt profile or sign in to personalize the ideas you see.</p>
+        <p className="account-lede">Create a Clockt preview profile to personalize the ideas you see.</p>
         <div className="account-tabs" role="tablist" aria-label="Account access">
           <button type="button" role="tab" aria-selected={mode === 'signup'} className={mode === 'signup' ? 'active' : ''} onClick={() => { setMode('signup'); setNotice('') }}>Create account</button>
-          <button type="button" role="tab" aria-selected={mode === 'signin'} className={mode === 'signin' ? 'active' : ''} onClick={() => { setMode('signin'); setNotice('') }}>Sign in</button>
+          <button hidden type="button" role="tab" aria-selected={mode === 'signin'} className={mode === 'signin' ? 'active' : ''} onClick={() => { setMode('signin'); setNotice('') }}>Sign in</button>
         </div>
         <form className="account-form" onSubmit={submit}>
           {mode === 'signup' && <label className="field-group"><span>Full name</span><input autoComplete="name" value={fullName} onChange={(event) => setFullName(event.target.value)} placeholder="Your name" required /></label>}

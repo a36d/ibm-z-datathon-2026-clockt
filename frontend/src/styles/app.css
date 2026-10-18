@@ -2781,7 +2781,7 @@ h2 {
 
 .account-tabs {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 4px;
   margin-bottom: 17px;
   padding: 4px;
