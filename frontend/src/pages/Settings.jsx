@@ -15,10 +15,10 @@ function Settings() {
   const interactedTips = workspace.tips.filter((tip) => tip.status === 'interacted' || tip.status === 'dismissed').length
 
   function cleanData() {
-    if (!window.confirm('Remove expired suggestions and clear all past conversations?')) return
+    if (!window.confirm('Remove expired preview suggestions and clear all saved conversation previews?')) return
     cleanExpired()
     clearHistory()
-    setNotice('Expired tips and conversation history were cleared. Your unexpired suggestions and preferences were kept.')
+    setNotice('Expired preview suggestions and conversation previews were cleared. Your active suggestions and preferences were kept.')
   }
 
   function toggleGoal(goal) {
@@ -48,32 +48,32 @@ function Settings() {
               <legend>What would you like more time for?</legend>
               {['Focused work', 'Creative thinking', 'Time with my team', 'Learning'].map((goal) => <label key={goal}><input type="checkbox" checked={settings.goals.includes(goal)} onChange={() => toggleGoal(goal)} />{goal}</label>)}
             </fieldset>
-            <p className="settings-helper">Your preferences are saved locally and used to tailor suggestions in this preview.</p>
+            <p className="settings-helper">Preview controls · Preferences are saved locally and do not yet change live recommendations.</p>
           </section>
 
           <section className="section-panel settings-card" id="ai-settings">
-            <div className="settings-card-heading"><div className="settings-icon pink">✳</div><div><h2>AI suggestion preferences</h2><p>Choose how Clockt prioritizes and displays ideas.</p></div></div>
-            <label className="range-setting"><span><strong>Suggestion sensitivity</strong><small>Higher sensitivity surfaces more patterns</small></span><span className="range-value">{settings.sensitivity}%</span><input type="range" min="0" max="100" value={settings.sensitivity} onChange={(event) => updateSettings({ sensitivity: Number(event.target.value) })} /></label>
-            <label className="settings-row max-recommendations"><span><strong>Maximum suggestions at a time</strong><p>The AI priority queue replaces resolved tips with the next ideas.</p></span><select value={settings.maxRecommendations} onChange={(event) => updateSettings({ maxRecommendations: Number(event.target.value) })}><option value="3">3 suggestions</option><option value="4">4 suggestions</option><option value="6">6 suggestions</option><option value="10">10 suggestions</option></select></label>
+            <div className="settings-card-heading"><div className="settings-icon pink">✳</div><div><h2>AI suggestion preferences · Preview</h2><p>Preview controls for prioritizing and displaying improvement ideas.</p></div></div>
+            <label className="range-setting"><span><strong>Suggestion sensitivity</strong><small>Higher sensitivity prioritizes more productivity opportunities.</small></span><span className="range-value">{settings.sensitivity}%</span><input type="range" min="0" max="100" value={settings.sensitivity} onChange={(event) => updateSettings({ sensitivity: Number(event.target.value) })} /></label>
+            <label className="settings-row max-recommendations"><span><strong>Maximum recommendations at a time</strong><p>Preview setting for how many ideas appear in the priority queue.</p></span><select value={settings.maxRecommendations} onChange={(event) => updateSettings({ maxRecommendations: Number(event.target.value) })}><option value="3">3 recommendations</option><option value="4">4 recommendations</option><option value="6">6 recommendations</option><option value="10">10 recommendations</option></select></label>
           </section>
 
           <section className="section-panel settings-card" id="privacy">
             <div className="settings-card-heading"><div className="settings-icon blue">◇</div><div><h2>Privacy & data</h2><p>Understand what Clockt stores and how it is used.</p></div></div>
-            <div className="privacy-explanation"><strong>Private by design</strong><p>Activity details and your preferences help Clockt find repeated work and suggest useful improvements. This preview stores workspace data locally in your browser. Passwords are not stored here.</p></div>
-            <label className="cleanup-toggle"><span><strong>Automatically remove expired tips</strong><small>Remove unaccepted tips 24 hours after you interact with them.</small></span><input type="checkbox" checked={settings.autoClean} onChange={(event) => updateSettings({ autoClean: event.target.checked })} /></label>
+            <div className="privacy-explanation"><strong>Data handling in this preview</strong><p>Opportunity entries are sent to your configured API service. Preferences and conversation previews are saved locally in this browser. Passwords are never stored here.</p></div>
+            <label className="cleanup-toggle"><span><strong>Automatically remove expired suggestions · Preview</strong><small>Remove unaccepted preview suggestions 24 hours after you interact with them.</small></span><input type="checkbox" checked={settings.autoClean} onChange={(event) => updateSettings({ autoClean: event.target.checked })} /></label>
           </section>
 
           <section className="section-panel settings-card" id="storage">
             <div className="settings-card-heading"><div className="settings-icon amber">▤</div><div><h2>Storage & cleanup</h2><p>Review and manage the data saved by this workspace.</p></div></div>
             <div className="storage-summary">
               <div><span>Workspace data</span><strong>{formatBytes(dataSize)}</strong></div>
-              <div><span>Past conversations</span><strong>{workspace.conversations.length}</strong></div>
-              <div><span>Unaccepted tips</span><strong>{interactedTips}</strong></div>
+              <div><span>Conversation previews</span><strong>{workspace.conversations.length}</strong></div>
+              <div><span>Unaccepted preview suggestions</span><strong>{interactedTips}</strong></div>
               <div><span>Expired, awaiting cleanup</span><strong>{pendingCleanup}</strong></div>
               <div className="storage-progress"><span style={{ width: `${Math.min(100, Math.max(4, (dataSize / (1024 * 1024)) * 100))}%` }} /></div>
               <small>Approximate size of Clockt workspace preferences and suggestion history on this device.</small>
             </div>
-            <div className="settings-row storage-clean-row"><div><strong>Clean workspace data</strong><p>Remove expired tips and past conversation history. Your active suggestions and preferences remain.</p></div><button className="button button-delete" type="button" onClick={cleanData}>Clean now</button></div>
+            <div className="settings-row storage-clean-row"><div><strong>Clean local preview data</strong><p>Remove expired preview suggestions and saved conversation previews. Your active suggestions and preferences remain.</p></div><button className="button button-delete" type="button" onClick={cleanData}>Clean now</button></div>
           </section>
           <p className="settings-footnote">Clockt desktop preview <span>·</span> Workspace data stays on this device.</p>
         </div>

@@ -5,11 +5,12 @@ import '../styles/app.css'
 function Layout() {
   const { pathname } = useLocation()
   const isOverview = pathname === '/'
+  const hasDashboardTint = ['/analytics', '/activities', '/recommendations', '/settings', '/account'].includes(pathname)
 
   return (
     <div className="app-shell">
       <Sidebar />
-      <div className="app-main">
+      <div className={`app-main${hasDashboardTint ? ' dashboard-tint' : ''}`}>
         <main className={`page-content${isOverview ? ' overview-content' : ''}`}>
           <Outlet />
         </main>

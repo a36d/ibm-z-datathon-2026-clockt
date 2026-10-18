@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useClockt } from '../contexts/clocktContext.js'
+import { getRecommendations } from '../services/api.js'
 
 const navGroups = [
   {
@@ -7,7 +9,7 @@ const navGroups = [
     items: [
       { to: '/', label: 'Overview', icon: 'grid', end: true },
       { to: '/analytics', label: 'Analytics', icon: 'chart' },
-      { to: '/activities', label: 'Activity log', icon: 'clock' },
+      { to: '/activities', label: 'Efficiency Log', icon: 'clock' },
     ],
   },
   {
@@ -33,14 +35,41 @@ function NavIcon({ name }) {
 }
 
 function Sidebar() {
-  const { workspace, clock } = useClockt()
-  const recommendationsCount = Math.min(
-    workspace.settings.maxRecommendations,
-    workspace.tips.filter((tip) =>
-      ['new', 'interacted'].includes(tip.status) &&
-      (!tip.expiresAt || !clock || new Date(tip.expiresAt).getTime() > clock),
-    ).length,
-  )
+  const { workspace } = useClockt()
+  const [recommendationsCount, setRecommendationsCount] = useState(null)
+  const profileName = typeof workspace?.profile?.fullName === 'string' && workspace.profile.fullName.trim()
+    ? workspace.profile.fullName
+    : 'Clockt user'
+  const profileEmail = typeof workspace?.profile?.email === 'string' && workspace.profile.email.trim()
+    ? workspace.profile.email
+    : 'Personal account'
+
+  useEffect(() => {
+    let isMounted = true
+
+    getRecommendations()
+      .then((response) => {
+        const recommendations = Array.isArray(response)
+          ? response
+          : Array.isArray(response?.items)
+            ? response.items
+            : Array.isArray(response?.recommendations)
+              ? response.recommendations
+              : null
+        if (isMounted && recommendations) {
+          setRecommendationsCount(
+            recommendations.filter((item) => item && typeof item === 'object').length,
+          )
+        }
+      })
+      .catch(() => {
+        if (isMounted) setRecommendationsCount(null)
+      })
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
   return (
     <aside className="sidebar">
@@ -48,15 +77,6 @@ function Sidebar() {
         <span className="brand-mark"><span /></span>
         <span>clockt<span className="brand-period">.</span></span>
       </NavLink>
-
-      <div className="workspace-switcher">
-        <div className="workspace-avatar">P</div>
-        <div className="workspace-copy">
-          <span className="workspace-name">Personal space</span>
-          <span className="workspace-caption">Free plan</span>
-        </div>
-        <span className="switcher-chevron">⌄</span>
-      </div>
 
       <nav className="side-nav" aria-label="Main navigation">
         {navGroups.map((group) => (
@@ -72,7 +92,9 @@ function Sidebar() {
               >
                 <NavIcon name={item.icon} />
                 <span>{item.label}</span>
-                {item.to === '/recommendations' && <span className="nav-count">{recommendationsCount}</span>}
+                {item.to === '/recommendations' && recommendationsCount !== null && (
+                  <span className="nav-count">{recommendationsCount}</span>
+                )}
               </NavLink>
             ))}
           </div>
@@ -82,16 +104,16 @@ function Sidebar() {
       <div className="sidebar-bottom">
         <div className="sidebar-tip">
           <div className="tip-spark"><NavIcon name="spark" /></div>
-          <p className="tip-title">Make room for what matters.</p>
-          <p className="tip-copy">Small automations add up to meaningful time back.</p>
+          <p className="tip-title">Find a better way to work.</p>
+          <p className="tip-copy">Save time and improve the quality of the work you do.</p>
         </div>
         <NavLink to="/settings" className={({ isActive }) => `nav-link settings-link${isActive ? ' active' : ''}`}>
           <NavIcon name="settings" />
           <span>Settings</span>
         </NavLink>
         <NavLink to="/account" className="profile-row profile-link" aria-label="Manage account">
-          <div className="profile-avatar">{workspace.profile.fullName.slice(0, 1).toUpperCase()}</div>
-          <div className="profile-copy"><span>{workspace.profile.fullName}</span><small>{workspace.profile.email || 'Personal account'}</small></div>
+          <div className="profile-avatar">{profileName.slice(0, 1).toUpperCase()}</div>
+          <div className="profile-copy"><span>{profileName}</span><small>{profileEmail}</small></div>
           <span className="profile-more">···</span>
         </NavLink>
       </div>
