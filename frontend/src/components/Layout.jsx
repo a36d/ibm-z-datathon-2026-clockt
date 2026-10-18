@@ -10,7 +10,7 @@ function Layout() {
   return (
     <div className="app-shell">
       <Sidebar />
-      <div className={`app-main${hasDashboardTint ? ' dashboard-tint' : ''}`}>
+      <div className={`app-main${isOverview ? ' overview-main' : ''}${hasDashboardTint ? ' dashboard-tint' : ''}`}>
         <main className={`page-content${isOverview ? ' overview-content' : ''}`}>
           <Outlet />
         </main>

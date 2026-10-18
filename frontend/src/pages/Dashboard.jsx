@@ -199,8 +199,8 @@ function Dashboard() {
                   <circle cx="12" cy="12" r="2.5" />
                 </svg>
               </span>
-              <span className="watcher-status">Advanced scan</span>
-              <span className="watcher-button-state">
+              <span className={`watcher-status${isScanActive ? ' active' : ''}`}>Advanced scan</span>
+              <span className={`watcher-button-state${isScanActive ? ' active' : ''}`}>
                 {isScanActive ? 'Active' : 'Inactive'}
               </span>
             </button>

@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
-import { useClockt } from '../contexts/clocktContext.js'
 import { getRecommendations } from '../services/api.js'
 
 const navGroups = [
@@ -35,14 +34,7 @@ function NavIcon({ name }) {
 }
 
 function Sidebar() {
-  const { workspace } = useClockt()
   const [recommendationsCount, setRecommendationsCount] = useState(null)
-  const profileName = typeof workspace?.profile?.fullName === 'string' && workspace.profile.fullName.trim()
-    ? workspace.profile.fullName
-    : 'Clockt user'
-  const profileEmail = typeof workspace?.profile?.email === 'string' && workspace.profile.email.trim()
-    ? workspace.profile.email
-    : 'Personal account'
 
   useEffect(() => {
     let isMounted = true
@@ -110,11 +102,6 @@ function Sidebar() {
         <NavLink to="/settings" className={({ isActive }) => `nav-link settings-link${isActive ? ' active' : ''}`}>
           <NavIcon name="settings" />
           <span>Settings</span>
-        </NavLink>
-        <NavLink to="/account" className="profile-row profile-link" aria-label="Manage account">
-          <div className="profile-avatar">{profileName.slice(0, 1).toUpperCase()}</div>
-          <div className="profile-copy"><span>{profileName}</span><small>{profileEmail}</small></div>
-          <span className="profile-more">···</span>
         </NavLink>
       </div>
     </aside>
