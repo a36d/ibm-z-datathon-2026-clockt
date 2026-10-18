@@ -9,6 +9,8 @@ import json
 import os
 import time
 import uuid
+from datetime import datetime, timedelta, timezone
+from hashlib import sha256
 
 import torch
 import uvicorn
@@ -205,6 +207,88 @@ def get_statistics():
     activities = get_activities()
 
     return calculate_activity_statistics(activities)
+
+
+# --------------------------------------------------
+# Recommendations for the Electron frontend
+# --------------------------------------------------
+
+class RecommendationResponse(BaseModel):
+    id: str
+    appIcon: str
+    application: str
+    activity: str
+    priority: str
+    repetitions: int
+    timeLost: str
+    timeSaved: str
+    suggestion: str
+    category: str
+
+
+def format_duration(seconds: float) -> str:
+    minutes = max(0.0, seconds) / 60
+    if minutes < 1:
+        return "<1 min"
+    if minutes < 60:
+        return f"{round(minutes)} min"
+    hours = int(minutes // 60)
+    remainder = round(minutes % 60)
+    return f"{hours} hr" + (f" {remainder} min" if remainder else "")
+
+
+@app.get(
+    f"/{API_VERSION}/recommendations",
+    response_model=list[RecommendationResponse],
+)
+def list_recommendations():
+    """Return recommendations based on the past seven days of stored activity.
+
+    Time-savings figures are rough 20% heuristics, not measured outcomes.
+    """
+    cutoff = datetime.now(timezone.utc) - timedelta(days=7)
+    activities = []
+    for row in get_activities():
+        try:
+            timestamp = datetime.fromisoformat(row["timestamp"].replace("Z", "+00:00"))
+        except (TypeError, ValueError):
+            continue
+        if timestamp.tzinfo is None:
+            timestamp = timestamp.replace(tzinfo=timezone.utc)
+        if timestamp.astimezone(timezone.utc) < cutoff:
+            continue
+        activities.append(Activity(
+            timestamp=timestamp,
+            application=row["application"],
+            action=row["action"],
+            duration_seconds=float(row["duration_seconds"]),
+        ))
+
+    suggestions = generate_suggestions(find_repeated_activities(activities))
+    results = []
+    for item in suggestions:
+        application = item["application"]
+        action = item["action"]
+        repetitions = item["repetitions"]
+        seconds = item["total_seconds"]
+        category = "Automation" if repetitions >= 5 else "Workflow"
+        priority = "High" if repetitions >= 5 else "Medium"
+        key = f"{application}\0{action}"
+        stable_id = sha256(key.encode("utf-8")).hexdigest()[:16]
+        estimate_seconds = seconds * 0.20
+        results.append({
+            "id": stable_id,
+            "appIcon": (application[:1].upper() or "•"),
+            "application": application,
+            "activity": action,
+            "priority": priority,
+            "repetitions": repetitions,
+            "timeLost": format_duration(seconds),
+            "timeSaved": f"~{format_duration(estimate_seconds)} (est.)",
+            "suggestion": item["suggestion"],
+            "category": category,
+        })
+    return sorted(results, key=lambda item: (-item["repetitions"], item["application"], item["activity"]))
 
 
 # --------------------------------------------------
