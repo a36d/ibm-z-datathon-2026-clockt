@@ -1,16 +1,31 @@
-# React + Vite
+# Clockt Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Clockt is a React and Electron productivity assistant for identifying repeated work and suggesting ways to save time.
 
-Currently, two official plugins are available:
+## Run locally
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```sh
+npm install
+npm run dev
+```
 
-## React Compiler
+To run the Electron desktop shell with Vite:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```sh
+npm start
+```
 
-## Expanding the ESLint configuration
+The frontend uses React Router for these screens:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- `/` — prioritized AI suggestions and recently engaged conversations
+- `/analytics` — activity and application analytics
+- `/activities` — activity entry and analysis
+- `/recommendations` — recommendation list
+- `/settings` — suggestion preferences, account personalization, and local-data cleanup
+- `/account` — sign-up/sign-in preview
+
+## Local data and backend
+
+The current dashboard suggestions, conversations, preferences, and profile name/email are saved in browser local storage under `clockt:workspace`. Interacting with an unaccepted suggestion starts a 24-hour cleanup timer. Automatic cleanup can be toggled in Settings; the manual cleanup action removes expired tips and conversation history while retaining unexpired suggestions and preferences.
+
+Activity and analytics requests use the FastAPI service configured with `VITE_API_URL`, defaulting to `http://127.0.0.1:8000`. The account screen is a frontend preview only: it does not authenticate against FastAPI, transmit passwords, or save passwords. Connect it to the backend’s secure authentication endpoints before using it for real accounts.
