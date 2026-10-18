@@ -1,0 +1,47 @@
+# Private activity data
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# Python temporary files
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# AI model files and caches
+models/
+model_cache/
+.cache/
+*.safetensors
+*.bin
+*.gguf
+
+# Logs and temporary files
+*.log
+*.tmp
+*.pid
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Packaging output
+build/
+dist/
+*.spec
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# JupyterLab automatic backups
+.ipynb_checkpoints/*.zip
+ 
+*.zip
